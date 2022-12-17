@@ -8,7 +8,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-let departmentArr = []
+let deptArray = []
 let roleArr = []
 let employeeArr = []
 
@@ -56,7 +56,7 @@ inquirer.prompt([
             break;
 
         case "Update Employee Role":
-            updateEmployee ()
+            updateEmployee()
             break;
 
         default:
@@ -66,7 +66,7 @@ inquirer.prompt([
 })
 
 function init() {
-    departmentArr = []
+    deptArray = []
     roleArr = []
     employeeArr = []
 
@@ -103,7 +103,7 @@ function init() {
                 break;
 
             case "Update Employee Role":
-                updateEmployee ()
+                updateEmployee()
                 break;
 
             default:
@@ -113,10 +113,10 @@ function init() {
     })
 }
 
-function viewDepartments () {
+function viewDepartments() {
     db.query(`SELECT * FROM departments`, (err, result) => {
         if (err) {
-        console.log(err);
+            console.log(err);
         }
         console.log('')
         console.table(result)
@@ -125,10 +125,10 @@ function viewDepartments () {
     });
 }
 
-function viewRoles () {
+function viewRoles() {
     db.query(`SELECT * FROM roles`, (err, result) => {
         if (err) {
-        console.log(err);
+            console.log(err);
         }
         console.log('')
         console.table(result)
@@ -137,14 +137,84 @@ function viewRoles () {
     });
 }
 
-function viewEmployees () {
+function viewEmployees() {
     db.query(`SELECT * FROM employees`, (err, result) => {
         if (err) {
-        console.log(err);
+            console.log(err);
         }
         console.log('')
         console.table(result)
         console.log('')
         init()
     });
+}
+
+function addDepartment() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What would you like to name this new department?",
+            name: "newDept"
+        },
+    ]).then(answer => {
+        db.query(`INSERT INTO departments (name) VALUES ("${answer.newDept}")`)
+        init();
+    })
+}
+
+function addEmployee() {
+    viewRoles()
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the first name of the employee?",
+            name: "firstName"
+        },
+        {
+            type: "input",
+            message: "What is the last name of the employee?",
+            name: "lastName"
+        },
+        {
+            name: "question1",
+            type: "list",
+            message: "What is the id of the role this employee belongs to?",
+            choices: roleArr
+        },
+        {
+            name: "question2",
+            type: "list",
+            message: "Is this person a manager? (0 for no, 1 for yes)",
+            choices: [0, 1]
+        }
+    ]).then(answer => {
+        db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES 
+        ("${answer.firstName}", "${answer.lastName}", ${answer.question1}, ${answer.question2})`)
+        init();
+    })
+}
+
+function addRole() {
+    viewDepartments()
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What would you like to name this new role?",
+            name: "newRole"
+        },
+        {
+            name: "question",
+            type: "list",
+            message: "What is the id of the department this roles belongs to?",
+            choices: deptArray
+        },
+        {
+            type: "input",
+            message: "What is the salary of this role? (withoutcommas)",
+            name: "roleSalary"
+        }
+    ]).then(answer => {
+        db.query(`INSERT INTO roles (title, department, salary) VALUES ("${answer.newRole}", ${answer.question}, ${answer.roleSalary})`)
+        init();
+    })
 }
