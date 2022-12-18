@@ -8,9 +8,9 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-let deptArray = [];
-let roleArray = [];
-let empArray = [];
+let deptArray = []
+let roleArray = []
+let empArray = []
 
 
 const db = mysql.createConnection(
@@ -22,6 +22,39 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to database.`)
 );
+
+function findDepartments() {
+    db.query(`SELECT * FROM departments`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        for (let i = 0; i < result.length. i++;) {
+            deptArray.push(i+1)
+        }
+    });
+}
+
+function findRoles() {
+    db.query(`SELECT * FROM roles`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        for (let i = 0; i < result.length. i++;) {
+            roleArray.push(i+1)
+        }
+    });
+}
+
+function findEmployees() {
+    db.query(`SELECT * FROM employees`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        for (let i = 0; i < result.length. i++;) {
+            empArray.push(i+1)
+        }
+    });
+}
 
 function init() {
     deptArray = []
@@ -71,41 +104,7 @@ function init() {
     })
 }
 
-function viewDepartments() {
-    db.query(`SELECT * FROM departments`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        console.log('')
-        console.table(result)
-        console.log('')
-        init()
-    });
-}
 
-function viewRoles() {
-    db.query(`SELECT * FROM roles`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        console.log('')
-        console.table(result)
-        console.log('')
-        init()
-    });
-}
-
-function viewEmployees() {
-    db.query(`SELECT * FROM employees`, (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        console.log('')
-        console.table(result)
-        console.log('')
-        init()
-    });
-}
 
 function addDepartment() {
     inquirer.prompt([
@@ -121,6 +120,7 @@ function addDepartment() {
 }
 
 function addRole() {
+    findDepartments()
     inquirer.prompt([
         {
             type: "input",
@@ -145,6 +145,7 @@ function addRole() {
 }
 
 function addEmployee() {
+    findRoles();
     inquirer.prompt([
         {
             type: "input",
@@ -176,6 +177,8 @@ function addEmployee() {
 }
 
 function updateEmployee () {
+    findEmployees()
+    findRoles()
     inquirer.prompt([
         {
             type: "input",
