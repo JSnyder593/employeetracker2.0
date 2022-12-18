@@ -1,5 +1,5 @@
 const express = require('express');
-const inquirer = require("inquirer");
+const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
 const PORT = process.env.PORT || 3001;
@@ -22,48 +22,6 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to database.`)
 );
-
-inquirer.prompt([
-    {
-        name: "question",
-        type: "list",
-        choices: ["View Departments", "View Roles", "View Employees", "Add Department", "Add Role", "Add Employee", "Update Employee Role", "Quit"]
-    }
-]).then(ans => {
-    switch (ans.question) {
-        case "View Departments":
-            viewDepartments();
-            break;
-
-        case "View Roles":
-            viewRoles()
-            break;
-
-        case "View Employees":
-            viewEmployees()
-            break;
-
-        case "Add Department":
-            addDepartment()
-            break;
-
-        case "Add Role":
-            addRole()
-            break;
-
-        case "Add Employee":
-            addEmployee()
-            break;
-
-        case "Update Employee Role":
-            updateEmployee()
-            break;
-
-        default:
-            console.log("See you next time!")
-            break;
-    }
-})
 
 function init() {
     deptArray = []
@@ -162,6 +120,31 @@ function addDepartment() {
     })
 }
 
+function addRole() {
+    viewDepartments()
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What would you like to name this new role?",
+            name: "newRole"
+        },
+        {
+            name: "question",
+            type: "list",
+            message: "What is the id of the department this roles belongs to?",
+            choices: deptArray
+        },
+        {
+            type: "input",
+            message: "What is the salary of this role? (withoutcommas)",
+            name: "roleSalary"
+        }
+    ]).then(answer => {
+        db.query(`INSERT INTO roles (title, department, salary) VALUES ("${answer.newRole}", ${answer.question}, ${answer.roleSalary})`)
+        init();
+    })
+}
+
 function addEmployee() {
     viewRoles()
     inquirer.prompt([
@@ -194,27 +177,32 @@ function addEmployee() {
     })
 }
 
-function addRole() {
-    viewDepartments()
+function updateEmployee () {
+    viewEmployees ()
+    viewRoles()
     inquirer.prompt([
         {
             type: "input",
-            message: "What would you like to name this new role?",
-            name: "newRole"
+            message: "click enter to proceed",
+            name: "null"
         },
         {
-            name: "question",
+            name: "question1",
             type: "list",
-            message: "What is the id of the department this roles belongs to?",
-            choices: deptArray
+            message: "What is the id of the employee you're trying to update?",
+            choices: employeeArr
         },
         {
-            type: "input",
-            message: "What is the salary of this role? (withoutcommas)",
-            name: "roleSalary"
+            name: "question2",
+            type: "list",
+            message: "What is the id of the role this employee belongs to?",
+            choices: roleArr
         }
     ]).then(answer => {
-        db.query(`INSERT INTO roles (title, department, salary) VALUES ("${answer.newRole}", ${answer.question}, ${answer.roleSalary})`)
+        db.query(`UPDATE employees SET role_id = ${answer.question2} WHERE id = ${answer.question1}`)
         init();
     })
 }
+
+init()
+
