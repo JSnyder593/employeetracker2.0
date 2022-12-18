@@ -8,9 +8,9 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-let deptArray = []
-let roleArr = []
-let employeeArr = []
+let deptArray = [];
+let roleArray = [];
+let empArray = [];
 
 
 const db = mysql.createConnection(
@@ -25,8 +25,8 @@ const db = mysql.createConnection(
 
 function init() {
     deptArray = []
-    roleArr = []
-    employeeArr = []
+    roleArray = []
+    empArray = []
 
     inquirer.prompt([
         {
@@ -121,7 +121,6 @@ function addDepartment() {
 }
 
 function addRole() {
-    viewDepartments()
     inquirer.prompt([
         {
             type: "input",
@@ -136,7 +135,7 @@ function addRole() {
         },
         {
             type: "input",
-            message: "What is the salary of this role? (withoutcommas)",
+            message: "What is the salary of this role? (without commas)",
             name: "roleSalary"
         }
     ]).then(answer => {
@@ -146,7 +145,6 @@ function addRole() {
 }
 
 function addEmployee() {
-    viewRoles()
     inquirer.prompt([
         {
             type: "input",
@@ -162,7 +160,7 @@ function addEmployee() {
             name: "question1",
             type: "list",
             message: "What is the id of the role this employee belongs to?",
-            choices: roleArr
+            choices: roleArray
         },
         {
             name: "question2",
@@ -178,8 +176,6 @@ function addEmployee() {
 }
 
 function updateEmployee () {
-    viewEmployees ()
-    viewRoles()
     inquirer.prompt([
         {
             type: "input",
@@ -190,13 +186,13 @@ function updateEmployee () {
             name: "question1",
             type: "list",
             message: "What is the id of the employee you're trying to update?",
-            choices: employeeArr
+            choices: empArray
         },
         {
             name: "question2",
             type: "list",
             message: "What is the id of the role this employee belongs to?",
-            choices: roleArr
+            choices: roleArray
         }
     ]).then(answer => {
         db.query(`UPDATE employees SET role_id = ${answer.question2} WHERE id = ${answer.question1}`)
