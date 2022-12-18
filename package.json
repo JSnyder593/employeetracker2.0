@@ -7,23 +7,25 @@
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3"
   },
-  "name": "employeetracker2.0",
+  "name": "employee-tracker",
+  "description": "This challenge was assigned so that I could apply SQL, constructor functions, etc. to create a user friendly terminal that can be interacted with to view employees, departments, roles so that they can be assigned, updated, etc. and be viewed in the terminal.",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JSnyder593/employeetracker2.0.git"
+    "url": "git+https://github.com/JSnyder593/Employee-Tracker.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JSnyder593/employeetracker2.0/issues"
+    "url": "https://github.com/JSnyder593/Employee-Tracker/issues"
   },
-  "homepage": "https://github.com/JSnyder593/employeetracker2.0#readme",
-  "description": ""
+  "homepage": "https://github.com/JSnyder593/Employee-Tracker#readme"
 }

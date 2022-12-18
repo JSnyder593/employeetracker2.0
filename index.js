@@ -1,5 +1,5 @@
 const express = require('express');
-const inquirer = require('inquirer');
+const inquirer = require("inquirer");
 const mysql = require('mysql2');
 
 const PORT = process.env.PORT || 3001;
@@ -8,9 +8,9 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-let deptArray = []
-let roleArray = []
-let empArray = []
+let departmentArr = []
+let roleArr = []
+let employeeArr = []
 
 
 const db = mysql.createConnection(
@@ -23,43 +23,43 @@ const db = mysql.createConnection(
     console.log(`Connected to database.`)
 );
 
-function findDepartments() {
-    db.query(`SELECT * FROM departments`, (err, result) => {
+function findDepartments () {
+    db.query(`SELECT name FROM departments`, (err, result) => {
         if (err) {
-            console.log(err);
+        console.log(err);
         }
-        for (let i = 0; i < result.length. i++;) {
-            deptArray.push(i+1)
+        for (let i = 0; i < result.length; i++) {
+            departmentArr.push(i+1)
         }
     });
 }
 
-function findRoles() {
-    db.query(`SELECT * FROM roles`, (err, result) => {
+function findRoles () {
+    db.query(`SELECT title FROM roles`, (err, result) => {
         if (err) {
-            console.log(err);
+        console.log(err);
         }
-        for (let i = 0; i < result.length. i++;) {
-            roleArray.push(i+1)
+        for (let i = 0; i < result.length; i++) {
+            roleArr.push(i+1)
         }
     });
 }
 
-function findEmployees() {
-    db.query(`SELECT * FROM employees`, (err, result) => {
+function findEmployees () {
+    db.query(`SELECT first_name FROM employees`, (err, result) => {
         if (err) {
-            console.log(err);
+        console.log(err);
         }
-        for (let i = 0; i < result.length. i++;) {
-            empArray.push(i+1)
+        for (let i = 0; i < result.length; i++) {
+            employeeArr.push(i+1)
         }
     });
 }
 
 function init() {
-    deptArray = []
-    roleArray = []
-    empArray = []
+    departmentArr = []
+    roleArr = []
+    employeeArr = []
 
     inquirer.prompt([
         {
@@ -94,7 +94,7 @@ function init() {
                 break;
 
             case "Update Employee Role":
-                updateEmployee()
+                updateEmployee ()
                 break;
 
             default:
@@ -104,48 +104,84 @@ function init() {
     })
 }
 
+function viewDepartments () {
+    db.query(`SELECT * FROM departments`, (err, result) => {
+        if (err) {
+        console.log(err);
+        }
+        console.log('')
+        console.table(result)
+        console.log('')
+        init()
+    });
+}
 
+function viewRoles () {
+    db.query(`SELECT * FROM roles`, (err, result) => {
+        if (err) {
+        console.log(err);
+        }
+        console.log('')
+        console.table(result)
+        console.log('')
+        init()
+    });
+}
 
-function addDepartment() {
+function viewEmployees () {
+    db.query(`SELECT * FROM employees`, (err, result) => {
+        if (err) {
+        console.log(err);
+        }
+        console.log('')
+        console.table(result)
+        console.log('')
+        init()
+    });
+}
+
+function addDepartment () {
     inquirer.prompt([
         {
             type: "input",
-            message: "What would you like to name this new department?",
-            name: "newDept"
+            message: "What is the name of the new department?",
+            name: "departmentName"
         },
     ]).then(answer => {
-        db.query(`INSERT INTO departments (name) VALUES ("${answer.newDept}")`)
+        db.query(`INSERT INTO departments (name) VALUES ("${answer.departmentName}")`)
         init();
     })
 }
 
-function addRole() {
+function addRole () {
+    // departmentArr = []
     findDepartments()
     inquirer.prompt([
         {
             type: "input",
-            message: "What would you like to name this new role?",
-            name: "newRole"
+            message: "What is the name of the new role?",
+            name: "roleName"
         },
         {
             name: "question",
             type: "list",
-            message: "What is the id of the department this roles belongs to?",
-            choices: deptArray
+            message: "What is the id of the department this role belongs to?",
+            choices: departmentArr
         },
         {
             type: "input",
-            message: "What is the salary of this role? (without commas)",
+            message: "What is the salary of the new role? (do not include commas)",
             name: "roleSalary"
         }
     ]).then(answer => {
-        db.query(`INSERT INTO roles (title, department, salary) VALUES ("${answer.newRole}", ${answer.question}, ${answer.roleSalary})`)
+        db.query(`INSERT INTO roles (title, department, salary) VALUES 
+        ("${answer.roleName}", ${answer.question}, '${answer.roleSalary}')`)
         init();
     })
 }
 
-function addEmployee() {
-    findRoles();
+function addEmployee () {
+    findRoles()
     inquirer.prompt([
         {
             type: "input",
@@ -161,13 +197,13 @@ function addEmployee() {
             name: "question1",
             type: "list",
             message: "What is the id of the role this employee belongs to?",
-            choices: roleArray
+            choices: roleArr
         },
         {
             name: "question2",
             type: "list",
             message: "Is this person a manager? (0 for no, 1 for yes)",
-            choices: [0, 1]
+            choices: [0,1]
         }
     ]).then(answer => {
         db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES 
@@ -177,7 +213,7 @@ function addEmployee() {
 }
 
 function updateEmployee () {
-    findEmployees()
+    findEmployees ()
     findRoles()
     inquirer.prompt([
         {
@@ -189,13 +225,13 @@ function updateEmployee () {
             name: "question1",
             type: "list",
             message: "What is the id of the employee you're trying to update?",
-            choices: empArray
+            choices: employeeArr
         },
         {
             name: "question2",
             type: "list",
             message: "What is the id of the role this employee belongs to?",
-            choices: roleArray
+            choices: roleArr
         }
     ]).then(answer => {
         db.query(`UPDATE employees SET role_id = ${answer.question2} WHERE id = ${answer.question1}`)
@@ -204,4 +240,3 @@ function updateEmployee () {
 }
 
 init()
-
